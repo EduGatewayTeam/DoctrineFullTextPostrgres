@@ -120,24 +120,37 @@ class TsVectorSubscriber implements EventSubscriber
 
                 $fields = $annot->fields;
                 $tsVectorVal = [];
-                foreach ($fields as $field) {
-                    if ($refl->hasMethod($field)) {
-                        $method = $refl->getMethod($field);
+                if (empty($fields)) {
+                    if ($refl->hasMethod($annot->source)) {
+                        $method = $refl->getMethod($annot->source);
                         $method->setAccessible(true);
                         $methodValue = $method->invoke($entity);
                         if (is_array($methodValue)) {
-                            $methodValue = implode(' ', $methodValue);
+                            $tsVectorVal = $methodValue;
+                        } else {
+                            $tsVectorVal[] = $methodValue;
                         }
-                        $tsVectorVal[] = $methodValue;
                     }
-                    if ($refl->hasProperty($field)) {
-                        $field = $refl->getProperty($field);
-                        $field->setAccessible(true);
-                        $fieldValue = $field->getValue($entity);
-                        if (is_array($fieldValue)) {
-                            $fieldValue = implode(' ', $fieldValue);
+                } else {
+                    foreach ($fields as $field) {
+                        if ($refl->hasMethod($field)) {
+                            $method = $refl->getMethod($field);
+                            $method->setAccessible(true);
+                            $methodValue = $method->invoke($entity);
+                            if (is_array($methodValue)) {
+                                $methodValue = implode(' ', $methodValue);
+                            }
+                            $tsVectorVal[] = $methodValue;
                         }
-                        $tsVectorVal[] = $fieldValue;
+                        if ($refl->hasProperty($field)) {
+                            $field = $refl->getProperty($field);
+                            $field->setAccessible(true);
+                            $fieldValue = $field->getValue($entity);
+                            if (is_array($fieldValue)) {
+                                $fieldValue = implode(' ', $fieldValue);
+                            }
+                            $tsVectorVal[] = $fieldValue;
+                        }
                     }
                 }
                 $prop->setAccessible(true);

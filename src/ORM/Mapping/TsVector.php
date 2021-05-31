@@ -21,9 +21,13 @@ final class TsVector extends Annotation
 {
     /**
      * @var array<string>
-     * @Annotation\Required()
      */
     public $fields = [];
+
+    /**
+     * @var string
+     */
+    public $source = null;
     /**
      * @var string
      */
